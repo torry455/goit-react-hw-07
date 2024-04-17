@@ -1,0 +1,16 @@
+.contactList {
+    margin: 0 auto;
+    width: 1010px;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 30px;
+    list-style-type: none;
+    margin-bottom: 50px;
+}
+
+.contactInfo {
+    text-align: center;
+    color: #57d75d;
+    margin-bottom: 100px;
+}
