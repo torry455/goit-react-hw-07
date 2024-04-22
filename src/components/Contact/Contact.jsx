@@ -9,7 +9,11 @@ const Contact = ({ contact }) => {
   const dispatch = useDispatch();
 
   const handleDeleteContact = () => {
-    dispatch(apiDeleteContacts(contact.id)); // Виклик action для видалення контакту за його ID
+    if (contact && contact.id) {
+      dispatch(apiDeleteContacts(contact.id));
+    } else {
+      console.error("Contact id is missing");
+    }
   };
   return (
     <li>

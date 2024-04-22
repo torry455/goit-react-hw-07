@@ -1,53 +1,46 @@
 import { useSelector } from "react-redux";
-import { selectContacts, selectNameFilter } from "../../redux/selectorsSlice";
+import { selectFilteredContacts } from "../../redux/selectorsSlice";
 import Contact from "../Contact/Contact";
 import css from "./ContactList.module.css";
 import Pagination from "../Pagination/Pagination";
 import { useState } from "react";
 
-const getVisibleContacts = (contacts, filter) => {
-  if (filter.length > 0) {
-    return contacts.filter(({ name }) =>
-      name.toLowerCase().includes(filter.trim().toLowerCase())
-    );
-  } else {
-    return contacts;
-  }
-};
-
 const ContactList = () => {
-  const contacts = useSelector(selectContacts);
-  const filter = useSelector(selectNameFilter);
-  const filterContacts = getVisibleContacts(contacts, filter);
+  const filteredContacts = useSelector(selectFilteredContacts);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
 
-  const [currentPage, setCurrentPage] = useState(0);
-  const contactsPerPage = 6;
-  const pageCount = Math.ceil(filterContacts.length / contactsPerPage);
-
-  const handlePageChange = ({ selected }) => {
-    setCurrentPage(selected);
-  };
-
-  const displayedContacts = filterContacts.slice(
-    currentPage * contactsPerPage,
-    (currentPage + 1) * contactsPerPage
-  );
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentContacts = filteredContacts
+    ? filteredContacts.slice(indexOfFirstItem, indexOfLastItem)
+    : [];
 
   return (
-    <>
-      {filterContacts.length > contactsPerPage ? (
-        <div>
+    <div>
+      {currentContacts.length > 0 ? (
+        <>
           <ul className={css.contactList}>
-            {displayedContacts.map((contact) => (
+            {currentContacts.map((contact) => (
               <Contact key={contact.id} contact={contact} />
             ))}
           </ul>
-        </div>
+          {/* Умовний рендерінг пагінації */}
+          {filteredContacts.length > itemsPerPage && (
+            <Pagination
+              pageCount={Math.ceil(filteredContacts.length / itemsPerPage)}
+              pageRangeDisplayed={5}
+              marginPagesDisplayed={2}
+              onPageChange={({ selected }) => setCurrentPage(selected + 1)}
+              containerClassName={"pagination"}
+              activeClassName={"active"}
+            />
+          )}
+        </>
       ) : (
-        <p className={css.contactInfo}>Your contact list is empty!</p>
+        <p className={css.contactInfo}>No contacts in your contact list!</p>
       )}
-      <Pagination pageCount={pageCount} onPageChange={handlePageChange} />
-    </>
+    </div>
   );
 };
 
